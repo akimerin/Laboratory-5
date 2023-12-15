@@ -1,0 +1,102 @@
+#include <iostream>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <cstdlib> 
+
+class Graph {
+public:
+    int vertices;
+
+    // Конструктор
+    Graph(int v) : vertices(v), adjacencyMatrix(v, std::vector<int>(v, 0)) {}
+
+    // Добавление ребра между вершинами u и v
+    void addEdge(int u, int v) {
+        adjacencyMatrix[u][v] = 1;
+    }
+
+    // Обход графа в глубину из вершины v
+    void dfs(int v, std::vector<bool>& visited, std::stack<int>& resultStack) {
+        visited[v] = true;
+
+        for (int i = 0; i < vertices; ++i) {
+            if (adjacencyMatrix[v][i] == 1 && !visited[i]) {
+                dfs(i, visited, resultStack);
+            }
+        }
+
+        resultStack.push(v); // Помещаем вершину в стек после обхода всех смежных вершин
+    }
+
+    // Топологическая сортировка вершин графа
+    void topologicalSort() {
+        std::vector<bool> visited(vertices, false);
+        std::stack<int> resultStack;
+
+        for (int i = 0; i < vertices; ++i) {
+            if (!visited[i]) {
+                dfs(i, visited, resultStack);
+            }
+        }
+
+        // Выводим вершины в топологическом порядке
+        std::cout << "Topographic sorting: ";
+        while (!resultStack.empty()) {
+            std::cout << resultStack.top() << " ";
+            resultStack.pop();
+        }
+        std::cout << std::endl;
+    }
+
+    // Обход графа в ширину из вершины v
+    void bfs(int v) {
+        std::vector<bool> visited(vertices, false);
+        std::queue<int> q;
+
+        visited[v] = true;
+        q.push(v);
+
+        while (!q.empty()) {
+            int currentVertex = q.front();
+            q.pop();
+
+            std::cout << currentVertex << " ";
+
+            for (int i = 0; i < vertices; ++i) {
+                if (adjacencyMatrix[currentVertex][i] == 1 && !visited[i]) {
+                    visited[i] = true;
+                    q.push(i);
+                }
+            }
+        }
+    }
+
+    std::vector<std::vector<int>> adjacencyMatrix; // Матрица смежности
+};
+
+int main() {
+    std::system("chcp 1251");
+    int numVertices;
+
+    // Вводим количество вершин графа
+    std::cout << "Enter the number of vertices of the graph: ";
+    std::cin >> numVertices;
+
+    // Создаем граф с введенным количеством вершин
+
+    Graph graph(numVertices);
+
+    // Вводим матрицу смежности
+    std::cout << "Enter the adjacency matrix of the graph:\n";
+    for (int i = 0; i < numVertices; ++i) {
+        for (int j = 0; j < numVertices; ++j) {
+            std::cin >> graph.adjacencyMatrix[i][j];
+        }
+    }
+
+    std::cout << "Topographic sorting: ";
+    graph.topologicalSort();
+
+    return 0;
+}
